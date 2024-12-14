@@ -1,0 +1,235 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/icons-material@latest/css/icons-material.css" />
+    <!-- For Material UI icons -->
+    <style>
+      /* Global reset */
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Arial", sans-serif;
+      }
+
+      /* Main container style */
+      .centered-div {
+        width: 600px;
+        height: 90%;
+        background-color: #f5f8fa; /* Light Twitter blue background */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+      }
+
+      /* Layout for the login section with the icons */
+      .header-icons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .header-icons .material-icons,
+      .login-link {
+        font-size: 36px;
+        color: #1da1f2;
+        cursor: pointer;
+      }
+
+      .login-link {
+        text-decoration: none;
+        color: #1da1f2;
+        font-size: 16px;
+      }
+
+      .login-link:hover {
+        text-decoration: underline;
+      }
+
+      /* Icon container setup */
+      .icon-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px; /* Increase the space between the icons */
+        margin-bottom: 20px;
+      }
+
+      .icon-div {
+        padding: 12px;
+        width: 50%;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.3s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Hover effect for icons */
+      .icon-div:hover {
+        background-color: #e1f5fe; /* Lighter blue on hover */
+        transform: scale(1.1); /* Slightly enlarge the icon container */
+      }
+
+      /* Active icon styling */
+      .active-icon {
+        background-color: #1da1f2; /* Twitter blue background */
+        color: white; /* White icon color */
+      }
+
+      /* Material icon style */
+      .material-icons {
+        font-size: 36px;
+        color: #657786; /* Twitter's neutral grey for the icon */
+        transition: color 0.3s, transform 0.3s ease;
+      }
+
+      /* Hover effect for icons */
+      .material-icons:hover {
+        color: #1da1f2; /* Twitter blue on hover */
+        transform: scale(1.1);
+      }
+
+      /* Active icon effect (on click) */
+      .material-icons:active {
+        color: #1a91da; /* Slightly darker blue when clicked */
+        transform: scale(0.95); /* Slightly shrink the icon */
+      }
+
+      /* Chat and group list styles */
+      .chat-group-list {
+        display: none;
+        padding: 0;
+        margin-top: 20px;
+        background-color: #e1f5fe; /* Lighter blue for list background */
+      }
+
+      .chat-group-list a {
+        display: block;
+        padding: 12px;
+        margin: 6px 0;
+        background-color: #ffffff;
+        border-radius: 6px;
+        color: #333333;
+        text-decoration: none;
+        transition: background-color 0.2s;
+      }
+
+      .chat-group-list a:hover {
+        background-color: #b3e5fc; /* Slightly darker blue on hover */
+      }
+      .profile-image {
+        margin-top: 7px;
+        height: 30px;
+        width: 30px;
+      }
+      .active {
+        display: block;
+      }
+      .user table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .user td {
+        padding: 8px; /* Add space between image and username */
+        vertical-align: middle; /* Align content vertically in the cell */
+      }
+
+      .user img {
+        border-radius: 50%; /* Circular image */
+        border: 1px solid #ddd; /* Light border for better definition */
+      }
+
+      .user_name {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333333; /* Neutral color for text */
+        transition: color 0.3s;
+      }
+
+      .user_name:hover {
+        color: #1a91da; /* Twitter blue on hover */
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="centered-div">
+      <!-- Header with icon and login link side by side -->
+      <div class="header-icons">
+        <!-- Left side icon -->
+        <div class="material-icons">person</div>
+
+        <!-- Right side Login link -->
+        <a href="{% url 'logout' %}" class="login-link">Logout</a>
+      </div>
+
+      <!-- Icons section with individual divs -->
+      <div class="icon-container">
+        <div id="chat-icon" class="icon-div active-icon" onclick="toggleList('chat')">
+          <span class="material-icons">person_add_alt</span>
+        </div>
+        <div id="group-icon" class="icon-div" onclick="toggleList('group')">
+          <span class="material-icons">group</span>
+        </div>
+      </div>
+
+      <div id="chat-list" class="chat-group-list active">
+        {% if users %}
+        <div class="user">
+          {% for user in users %}
+          <a href="{% url 'chat' username=user.username %}">
+            <div>
+              <span><img src="{% static 'assets/dp.png' %}" alt="Profile picture of {{ user.username }}" class="profile-image" /></span>
+              {{ user.username }}
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No users available.</p>
+        {% endif %}
+      </div>
+
+      <!-- Group List Section (Initially hidden) -->
+      <div id="group-list" class="chat-group-list">
+        {% for group in groups %}
+        <div><a href="{% url 'group' group.id %}">{{ group.name }}</a></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script>
+      function toggleList(type) {
+        document.getElementById("chat-list").classList.remove("active");
+        document.getElementById("group-list").classList.remove("active");
+        document.getElementById("chat-icon").classList.remove("active-icon");
+        document.getElementById("group-icon").classList.remove("active-icon");
+
+        // Show the selected list and highlight the corresponding icon
+        if (type === "chat") {
+          document.getElementById("chat-list").classList.add("active");
+          document.getElementById("chat-icon").classList.add("active-icon");
+        } else if (type === "group") {
+          document.getElementById("group-list").classList.add("active");
+          document.getElementById("group-icon").classList.add("active-icon");
+        }
+      }
+    </script>
+  </body>
+</html>
