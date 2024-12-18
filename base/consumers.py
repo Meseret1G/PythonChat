@@ -1,10 +1,14 @@
 import datetime
 import json
-from django.core.files.base import ContentFile
+import uuid
+import os
 import base64
+from django.core.files.base import ContentFile
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from base.models import ChatModel
+from django.conf import settings
+from base.models import ChatModel 
+
 class PersonalChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         my_id = self.scope['user'].id
@@ -21,10 +25,11 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        
         await self.accept()
+        await self.send_chat_history()
 
     async def disconnect(self, close_code):
-        # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -32,41 +37,65 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None):
         data = json.loads(text_data)
-        message = data['message']
+        print(f"Received Data: {data}") 
+
+        message = data.get('message', '') 
         username = data['username']
         file_data = data.get('file', None)
 
         file_url = None  
-
+        timestamp = datetime.datetime.now().isoformat() 
         if file_data:
-            format, imgstr = file_data.split(';base64,')  
-            ext = format.split('/')[-1] 
-            file = ContentFile(base64.b64decode(imgstr), name=f"file.{ext}") 
-            file_url = await self.save_message(username, self.room_group_name, message, file)
-        else:
-            file_url = await self.save_message(username, self.room_group_name, message)
+            try:
+                if ';base64,' not in file_data:
+                    raise ValueError("Invalid base64 file format")
+                
+                format, imgstr = file_data.split(';base64,') 
+                ext = format.split('/')[-1]  
+                file_content = base64.b64decode(imgstr) 
+                os.makedirs('media/uploads', exist_ok=True)
+
+                filename = f"{uuid.uuid4()}.{ext}"
+                file_path = os.path.join(settings.MEDIA_ROOT, 'uploads', filename)
+
+                with open(file_path, "wb") as f:
+                    f.write(file_content)
+
+                file_url = f"/media/uploads/{filename}"  
+            except Exception as e:
+                print(f"Error processing file: {e}")
+                await self.send(text_data=json.dumps({
+                    'error': f"Error processing file: {str(e)}"
+                }))
+                return  
+
+        await self.save_message(username, self.room_name, message, file_url)
 
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                'type': 'chat_message',
-                'message': message,
-                'username': username,
-                'file': file_url,  
-                'timestamp': datetime.datetime.now().isoformat()
-            }
+                "type": "chat.message",
+                "message": message,
+                "username": username,
+                "file": file_url,
+                "timestamp": timestamp,  
+            },
         )
-    
-    async def chat_message(self,event):
+
+
+    async def chat_message(self, event):
         message = event['message']
-        username=event['username']
-        
-        await self.send(text_data = json.dumps({
-            'message':message,
-            'username':username,
-            'file': event['file'],
-            'timestamp': event['timestamp']
+        username = event['username']
+        file_url = event['file']
+        timestamp = event['timestamp']
+
+        await self.send(text_data=json.dumps({
+            'message': message,
+            'username': username,
+            'file': file_url,
+            'timestamp': timestamp
         }))
+
     @database_sync_to_async
     def save_message(self, username, thread_name, message, file=None):
         chat_message = ChatModel.objects.create(
@@ -75,21 +104,22 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             thread_name=thread_name,
             file=file
         )
-        return chat_message.file.url if chat_message.file else None 
+        return chat_message.file.url if chat_message.file else None
 
-# class OnlineStatusConsumer(AsyncWebsocketConsumer):
-#     async def connect(self):
-#         self.room_group_name ='user'
-#         await self.channel_layer.group_add(
-#             self.room_group_name,
-#             self.channel_name
-#         )       
-        
-#         await self.accept()
-        
-#     async def disconnect(self,message):
-#         self.channel_layer.group_discard(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-        
+    @database_sync_to_async
+    def get_chat_history(self, room_name):
+        messages = ChatModel.objects.filter(thread_name=room_name).order_by('timestamp')
+        chat_history = []
+        for message in messages:
+            chat_history.append({
+                'message': message.message,
+                'username': message.sender,
+                'file': message.file.url if message.file else None,
+                'timestamp': message.timestamp.isoformat(),
+            })
+        return chat_history
+
+    async def send_chat_history(self):
+        chat_history = await self.get_chat_history(self.room_name)
+        for message in chat_history:
+            await self.send(text_data=json.dumps(message))

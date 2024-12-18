@@ -10,21 +10,23 @@ socket.onopen = function (event) {
 
 socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
-    console.log("Received message:", data);
 
-    // Create a new row for the incoming message
+    // Check if there's a message or a file, and render accordingly
     let messageHTML = document.createElement('tr');
-    const fileLink = data.file
-        ? `<a href="${data.file}" target="_blank">${data.file.split('/').pop()}</a>`
-        : '';
-    const messageText = data.message ? data.message : 'No message content.';
 
+    const fileLink = data.file
+        ? `<p class="file-link"><a href="${data.file}" target="_blank">${data.file.split('/').pop()}</a></p>`
+        : '';
+
+    const messageText = data.message ? data.message : null;
+
+    // Render message if there's a message, or just the file if no message
     if (data.username === message_username) {
         messageHTML.innerHTML = `
             <td></td>
             <td class="text-right">
-                <p class="message-sent">${messageText}</p>
-                ${fileLink}
+                ${messageText ? `<p class="message-sent">${messageText}</p>` : ''}
+                ${fileLink ? `<p class="file-sent">${fileLink}</p>` : ''}
                 <small class="timestamp">
                     ${data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                 </small>
@@ -32,8 +34,8 @@ socket.onmessage = function (event) {
     } else {
         messageHTML.innerHTML = `
             <td class="text-left">
-                <p class="message-received">${messageText}</p>
-                ${fileLink}
+                ${messageText ? `<p class="message-received">${messageText}</p>` : ''}
+                ${fileLink ? `<p class="file-received">${fileLink}</p>` : ''}
                 <small class="timestamp">
                     ${data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                 </small>
@@ -43,7 +45,7 @@ socket.onmessage = function (event) {
 
     const chatBody = document.querySelector('#chat-body');
     chatBody.appendChild(messageHTML);
-    chatBody.scrollTop = chatBody.scrollHeight; 
+    chatBody.scrollTop = chatBody.scrollHeight; // Scroll to the bottom
 };
 
 socket.onerror = function (event) {
@@ -70,20 +72,19 @@ document.querySelector('#chat-message-submit').onclick = function (event) {
     if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
 
-        const formData = new FormData();
-        formData.append('file', file);
-
         const fileReader = new FileReader();
         fileReader.onloadend = function () {
-            const blobUrl = URL.createObjectURL(file);
-            data.file = blobUrl; 
-            socket.send(JSON.stringify(data));
-            fileInput.value = ''; 
+            const base64File = fileReader.result; // Base64-encoded file
+            console.log("Base64 File Sent:", base64File); // Log base64 file data to console
+        
+            data.file = base64File; // Attach the base64 string
+            socket.send(JSON.stringify(data)); // Send the data
+            fileInput.value = ''; // Clear the file input
         };
-        fileReader.readAsArrayBuffer(file); 
+        fileReader.readAsDataURL(file);
     } else {
         socket.send(JSON.stringify(data)); 
     }
- 
+
     messageInput.value = ''; 
 };

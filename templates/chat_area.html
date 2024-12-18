@@ -8,7 +8,12 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/icons-material@latest/css/icons-material.css" />
     <style>
-      /* Global reset */
+      @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap");
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+      }
       body,
       html {
         height: 100%;
@@ -19,34 +24,33 @@
         font-family: "Arial", sans-serif;
       }
       .icon-container {
-        display: flex; /* Enables flexbox layout */
-        justify-content: space-between; /* Distributes icons evenly */
-        align-items: center; /* Aligns icons vertically */
-        gap: 10px; /* Adds spacing between icons */
-        padding: 10px 0; /* Adds some padding */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
       }
 
       .icon-div {
-        display: flex; /* Ensures the icon itself can be a flex item */
-        justify-content: center; /* Centers icon horizontally */
-        align-items: center; /* Centers icon vertically */
+        display: flex;
+        justify-content: center;
+        align-items: center;
         cursor: pointer;
         padding: 10px;
-        background-color: #e1f5fe; /* Light background for each icon */
+        background-color: #e1f5fe;
         border-radius: 6px;
-        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
         transition: background-color 0.2s;
       }
 
       .icon-div:hover {
-        background-color: #b3e5fc; /* Slightly darker background on hover */
+        background-color: #b3e5fc;
       }
 
-      /* Main container style */
       .centered-div {
         width: 900px;
         height: 90%;
-        background-color: #f5f8fa; /* Light Twitter blue background */
+        background-color: #f5f8fa;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -56,7 +60,7 @@
       }
 
       .sidebar {
-        width: 45%; /* Adjusted width to make it wider */
+        width: 45%;
         height: 100%;
         background-color: #ffffff;
         border-radius: 10px;
@@ -68,7 +72,7 @@
       }
 
       .chat-area {
-        width: 55%; /* Adjusted from 70% to 65% to balance with the wider sidebar */
+        width: 55%;
         height: 100%;
         background-color: #ffffff;
         border-radius: 10px;
@@ -80,7 +84,6 @@
         box-sizing: border-box;
       }
 
-      /* Header for the sidebar */
       .header-icons {
         display: flex;
         justify-content: space-between;
@@ -104,7 +107,6 @@
         text-decoration: underline;
       }
 
-      /* List of chats and groups */
       .chat-group-list {
         display: none;
         flex-grow: 1;
@@ -129,8 +131,6 @@
         background-color: #b3e5fc;
       }
 
-      /* General styling for messages */
-      /* Chat area styling */
       .chat-area {
         width: 70%;
         height: 100%;
@@ -143,22 +143,19 @@
         padding: 10px;
         box-sizing: border-box;
       }
-
-      /* Messages container with hidden scroll bar */
       .messages {
         flex-grow: 1;
-        overflow-y: auto; /* Enable vertical scrolling */
-        scrollbar-width: none; /* For Firefox: hides the scrollbar */
-        -ms-overflow-style: none; /* For IE and Edge: hides the scrollbar */
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
         background-color: #f8f9fa;
         border-radius: 5px;
         padding: 10px;
         margin: 0;
       }
 
-      /* For Chrome, Edge, and Safari */
       .messages::-webkit-scrollbar {
-        display: none; /* Hides the scroll bar */
+        display: none;
       }
 
       #chat-body {
@@ -166,18 +163,17 @@
       }
 
       table {
-        width: 100%; /* Ensure table takes full width of the parent container */
-        height: 100%; /* Ensure table takes full height of the parent container */
-        table-layout: fixed; /* Prevent columns from stretching unevenly */
-        border-collapse: collapse; /* Remove gaps between table cells */
+        width: 100%;
+        height: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
       }
 
       td {
-        vertical-align: top; /* Aligns content to the top */
-        word-wrap: break-word; /* Ensures long words wrap within the cell */
+        vertical-align: top;
+        word-wrap: break-word;
       }
 
-      /* Sent messages */
       .message-sent {
         display: inline-block;
         max-width: 60%;
@@ -186,13 +182,12 @@
         padding: 10px;
         border-radius: 10px;
         margin-bottom: 5px;
-        margin-left: auto; /* Pushes the message to the extreme right */
+        margin-left: auto;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         clear: both;
         text-align: right;
       }
 
-      /* Received messages */
       .message-received {
         display: inline-block;
         max-width: 60%;
@@ -201,18 +196,39 @@
         padding: 10px;
         border-radius: 10px;
         margin-bottom: 5px;
-        margin-right: auto; /* Ensures the message stays on the extreme left */
+        margin-right: auto;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         clear: both;
         text-align: left;
       }
 
-      /* Timestamp styling */
       .timestamp {
         display: block;
         font-size: 0.8rem;
         color: gray;
         margin-top: 5px;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999y;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
       .text-left {
@@ -223,7 +239,6 @@
         text-align: right;
       }
 
-      /* Message input section */
       .message-input {
         display: flex;
         gap: 10px;
@@ -248,27 +263,141 @@
       .message-input button:hover {
         background-color: #0d8ddc;
       }
+      .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 10px;
+        margin-bottom: 10px;
+      }
+
+      .chat-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .chat-info i {
+        font-size: 24px;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .file-link {
+        display: inline-block;
+        padding: 8px 12px;
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        margin-top: 5px;
+        font-size: 14px;
+        max-width: 80%;
+        word-wrap: break-word;
+      }
+
+      .file-link a {
+        text-decoration: none;
+        color: #007bff;
+      }
+
+      .file-link a:hover {
+        text-decoration: underline;
+      }
+
+      .file-sent {
+        text-align: right;
+      }
+      .file-received {
+        text-align: left;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        transition: opacity 0.3s ease;
+      }
+
+      .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 500px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <div class="centered-div">
-      <!-- Sidebar -->
       <div class="sidebar">
-        <div class="header-icons">
-          <div class="material-icons" style="vertical-align: middle">person</div>
+        <div>
+          <a href="{% url 'profile' %}"> <div class="material-icons" style="vertical-align: middle">person</div></a>
           <span style="vertical-align: middle; margin-left: 8px">{{ request.user.username }}</span>
+        </div>
+        <div class="header-icons">
+          <a href="{% url 'home'%}">Back</a>
           <a href="{% url 'logout' %}" class="login-link" style="margin-left: auto">
             <i class="material-icons" style="vertical-align: middle">logout</i> Logout
           </a>
         </div>
 
-        <div class="icon-container">
-          <div id="chat-icon" class="icon-div" onclick="toggleList('chat')">
-            <span class="material-icons">person_add_alt</span>
-          </div>
-          <div id="group-icon" class="icon-div" onclick="toggleList('group')">
-            <span class="material-icons">group</span>
-          </div>
+        <div id="chat-icon" class="icon-div" onclick="toggleList('chat')">
+          <span class="material-icons">person_add_alt</span>
         </div>
 
         <div id="chat-list" class="chat-group-list active">
@@ -287,24 +416,15 @@
           <p>No users available.</p>
           {% endif %}
         </div>
-
-        <div id="group-list" class="chat-group-list">
-          {% if groups %} {% for group in groups %}
-          <div>
-            <a href="{% url 'group' group.id %}">
-              <i class="material-icons" style="vertical-align: middle; color: #1da1f2">group</i>
-              <span>{{ group.name }}</span>
-            </a>
-          </div>
-          {% endfor %} {% else %}
-          <p>No groups available.</p>
-          {% endif %}
-        </div>
       </div>
 
-      <!-- Chat area -->
       <div class="chat-area">
-        <!-- Messages -->
+        <div class="chat-header">
+          <div class="chat-info" style="cursor: pointer" onclick="showUserInfo()">
+            <i class="material-icons" style="color: rgb(255, 255, 255)">person</i>
+            <span>{{ user.username }}</span>
+          </div>
+        </div>
         <div class="messages" id="messages">
           <table class="table">
             <tbody id="chat-body">
@@ -341,7 +461,6 @@
           </table>
         </div>
 
-        <!-- Input area -->
         <div class="message-input">
           <input type="text" id="message_input" placeholder="Type a message..." />
           <input type="file" id="file_input" />
@@ -349,10 +468,37 @@
         </div>
       </div>
     </div>
+    <div id="userInfoModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>User Info</h2>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>First Name:</strong> {{ user.first_name }}</p>
+        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+        <a href="{% url 'remove_friend' user.username %}" class="btn btn-danger" id="removeFriendBtn">Remove Friend</a>
+      </div>
+    </div>
 
     {{user.id|json_script:"json-username"}} {{user.username|json_script:"json-username-receiver"}}
     {{request.user.username|json_script:"json-message-username"}}
 
     <script src="{% static 'js/chat.js' %}"></script>
+    <script>
+      function showUserInfo() {
+        document.getElementById("userInfoModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("userInfoModal").style.display = "none";
+      }
+
+      window.onclick = function (event) {
+        const modal = document.getElementById("userInfoModal");
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+    </script>
   </body>
 </html>

@@ -1,7 +1,10 @@
 from django import forms
-from .models import Profile
+from django.contrib.auth.models import User
 
-class ProfileForm(forms.ModelForm):
+class UserInfoEditForm(forms.ModelForm):
     class Meta:
-        model = Profile
-        fields = ['bio', 'profile_picture', 'location', 'birth_date']
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name']  
+
+class UserSearchForm(forms.Form):
+    query = forms.CharField(label='Search Users', max_length=100)

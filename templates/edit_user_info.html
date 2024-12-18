@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Your Information</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #333; 
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            height: 100vh; 
+        }
+
+        .container {
+            background-color: #ffffff; 
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+            padding: 30px; 
+            width: 90%;
+            max-width: 500px; 
+            transition: transform 0.3s; 
+        }
+
+        .container:hover {
+            transform: translateY(-5px); 
+        }
+
+        h2 {
+            color: #1a73e8; 
+            margin-bottom: 20px; 
+            font-size: 24px; 
+            text-align: center; 
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input, select {
+            margin-bottom: 5px; 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            transition: border-color 0.3s; 
+        }
+
+        input:focus, select:focus {
+            border-color: #1a73e8; 
+            outline: none; 
+        }
+
+        button {
+            background-color: #1a73e8; 
+            color: white;
+            border: none; 
+            border-radius: 5px; 
+            padding: 12px; 
+            cursor: pointer; 
+            transition: background-color 0.3s, transform 0.3s; 
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #155ab6;
+            transform: translateY(-2px);
+        }
+
+        a {
+            text-decoration: none; 
+            color: #1a73e8; 
+            display: block; 
+            margin-top: 10px; 
+            text-align: center; 
+            font-size: 16px; 
+        }
+
+        a:hover {
+            color: #155ab6;
+        }
+
+        .message-list {
+            margin-top: 20px; 
+            padding: 10px;
+            border-radius: 5px; 
+            background-color: #e1f5fe; 
+            list-style-type: none; 
+        }
+
+        .message-list li {
+            margin: 5px 0; 
+            padding: 8px; 
+            border-left: 5px solid #1a73e8; 
+            background-color: #f0f9ff; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Your Information</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <a href="{% url 'profile' %}">Cancel</a>
+
+        {% if messages %}
+        <ul class="message-list">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</body>
+</html>
